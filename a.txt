@@ -1,0 +1,11 @@
+struct box
+{
+	int a,*d;
+	float b[100][100];	
+	box *var;
+};
+	
+
+box c[10];
+
+int x,y;
