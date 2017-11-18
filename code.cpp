@@ -122,6 +122,7 @@ int main()
                }
             }
          }
+         x->link = NULL;
          def[x->type] = x;
       }
       else if(str == "typedef")
@@ -148,6 +149,7 @@ int main()
                x->name = s;
                x->dimension = def[new_type]->dimension;
                x->members = def[new_type]->members;
+               x->link = def[new_type];
                def[x->name] = x;
                en++;
                st = en;
@@ -225,6 +227,7 @@ int main()
          }
       }
    }
+
    /*for(auto q: var_to_type)
    {
       cout<<q.first<<endl;
