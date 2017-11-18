@@ -7,12 +7,14 @@ struct Datatype{
    vector<Datatype*> members;
    vector<int> dimension;
    int pointers = 0;
+   int line_number;
    Datatype* link;
 };
 
 map<string,Datatype*> var_to_type;
 set<string> types = {"int","float","double","char","void"};
 map<string,Datatype*> def;
+int l_no;
 
 int main()
 {
@@ -33,6 +35,7 @@ int main()
 
       if(str == "struct")
       {
+         l_no++;
          strstream >> str;
          Datatype* x = new Datatype;
          x->type = str;
@@ -41,12 +44,14 @@ int main()
          while(!fin.eof())
          {
             getline(fin,str);
+            l_no++;
             stringstream strstream(str);
             strstream >> str;
-            if(str =="{")  continue;
-            else if(str[0]=='}') break;
+            if(str =="{")  {  l_no++;  continue;   }
+            else if(str[0]=='}') {  l_no++;  break;   }
             else
             {
+               l_no++;
                string var_type = str;
                strstream >> str;
                int st=0 , en=0;
@@ -119,6 +124,36 @@ int main()
          }
          def[x->type] = x;
       }
+      else if(str == "typedef")
+      {
+         l_no++;
+         strstream >> str;
+         string new_type = str;
+         strstream >> str;
+         int st=0,en=0;
+         for(int i = 0; i<str.size(); i++)
+         {
+            if(str[i]==' ')
+            {
+               st++; en++;
+               continue;
+            }
+            else if(str[i]==',' || str[i]==';')
+            {
+               en = i;
+               string s = str.substr(st,en-st);
+               Datatype* x = new Datatype;
+               x->type = new_type;
+               x->pointers = def[new_type]->pointers;
+               x->name = s;
+               x->dimension = def[new_type]->dimension;
+               x->members = def[new_type]->members;
+               def[x->name] = x;
+               en++;
+               st = en;
+            }
+         }
+      }
       else
       {
          string var_type = str;
@@ -190,7 +225,6 @@ int main()
          }
       }
    }
-
    /*for(auto q: var_to_type)
    {
       cout<<q.first<<endl;
