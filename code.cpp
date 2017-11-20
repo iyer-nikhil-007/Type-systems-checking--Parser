@@ -12,9 +12,10 @@ struct Datatype{
 };
 
 map<string,Datatype*> var_to_type;
+map<string,Datatype*> struct_var_to_type;
 set<string> types = {"int","float","double","char","void"};
 map<string,Datatype*> def;
-int l_no,flag;
+int l_no,goto_flag=0;
 
 int main()
 {
@@ -22,6 +23,7 @@ int main()
    {
       Datatype* temp = new Datatype;
       temp->type= p;
+      temp->link = NULL;
       def[p]=temp;
    }
 
@@ -33,6 +35,8 @@ int main()
       string cur_line = str;
       stringstream strstream(str);
       strstream >> str;
+      if(str.empty())   continue;
+      //cout<<str<<endl;
 
       if(str == "struct")
       {
@@ -41,8 +45,12 @@ int main()
          for(int i=0; i<cur_line.size();i++)
          {
             if(cur_line[i]==';')
+            {
+               cout<<"AAAAAA\n";
                goto var_struct_dec;
+            }
          }
+         cout<<1<<endl;
          Datatype* x = new Datatype;
          x->type = str;
          types.insert(str);
@@ -123,7 +131,7 @@ int main()
                         y->name = var_name;
                      }
                      x->members.push_back(y);
-                     var_to_type[y->name] = y;
+                     //var_to_type[y->name] = y;
                   }
                }
             }
@@ -134,6 +142,7 @@ int main()
       else if(str == "typedef")
       {
          l_no++;
+         cout<<2<<endl;
          strstream >> str;
          string new_type = str;
          strstream >> str;
@@ -164,7 +173,9 @@ int main()
       }
       else
       {
-         var_struct_dec:flag = 1;
+         var_struct_dec: goto_flag = 1;
+         cout<<3<<endl;
+         //cout<<goto_flag<<endl;
          string var_type = str;
          strstream >> str;
 
@@ -230,12 +241,40 @@ int main()
                   string var_name = s.substr(s_start,s_end-s_start);
                   y->name = var_name;
                }
-               var_to_type[y->name] = y;
-               flag = 0;
+               if(goto_flag==1)
+                  struct_var_to_type[y->name] = y;
+               else var_to_type[y->name] = y;
+            }
+         }
+         goto_flag = 0;
+         //cout<<goto_flag<<endl<<endl;
+      }
+   }
+
+   set<string> name_eq,int_name_eq,struct_eq;
+
+   for(auto p:struct_var_to_type)
+   {
+      for(auto q:struct_var_to_type)
+      {
+         if(q.first != p.first)
+         {
+            //cout<<q.first<<" "<<p.first<<endl;
+            if(q.second->type==p.second->type)
+            {
+               if((q.second->pointers==0 && p.second->pointers==0) &&
+                  (q.second->dimension.size()==0 && p.second->dimension.size()==0))
+               {
+                  name_eq.insert(p.first);
+                  name_eq.insert(q.first);
+               }
             }
          }
       }
+      //cout<<endl;
    }
-   
-   return 0;
+   /*for(auto p:name_eq)
+      cout<<p<<" ";
+   cout<<endl;
+   */return 0;
 }

@@ -4,4 +4,16 @@ struct box
 	float b;
 };
 
-struct box B;
+struct box B,C;
+
+int a,b;
+
+int *c,*d;
+
+int e[10][10],f[10][10];
+
+typedef int cm,inch;
+
+inch x;
+
+cm y;
