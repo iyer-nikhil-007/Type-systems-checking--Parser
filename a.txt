@@ -17,3 +17,5 @@ typedef int cm,inch;
 inch x;
 
 cm y;
+
+cm X,Y;
