@@ -13,7 +13,7 @@ struct Datatype{
 
 map<string,Datatype*> var_to_type;
 map<string,Datatype*> struct_var_to_type;
-set<string> types = {"int","float","double","char","void"};
+set<string> types = {"int","float","double","char","void","struct"};
 map<string,Datatype*> def;
 int l_no,goto_flag=1;
 
@@ -58,7 +58,7 @@ int main()
          }
          //cout<<1<<endl;
          Datatype* x = new Datatype;
-         x->type = str;
+         x->type = "struct";
          types.insert(str);
          def[str] = x;
          while(!fin.eof())
@@ -136,6 +136,7 @@ int main()
                         string var_name = s.substr(s_start,s_end-s_start);
                         y->name = var_name;
                      }
+                     y->link = def[y->type];
                      x->members.push_back(y);
                      //var_to_type[y->name] = y;
                   }
@@ -282,17 +283,21 @@ int main()
          name_eq.insert(temp);
    }
 
-   set<set<string>> in_name_eq = name_eq;
+   set<set<string>> in_name_eq;
 
    for(auto p:var_to_type)
    {
       set<string> temp;
       for(auto q:var_to_type)
       {
-         if(q.first!=p.first && q.second->line_number==p.second->line_number)
+         if(q.first!=p.first && q.second->line_number == p.second->line_number)
          {
-            temp.insert(p.first);
-            temp.insert(q.first);
+            if(q.second->pointers == p.second->pointers
+               && p.second->dimension == q.second->dimension)
+            {
+               temp.insert(p.first);
+               temp.insert(q.first);
+            }
          }
       }
       if(!temp.empty()) in_name_eq.insert(temp);
@@ -305,11 +310,126 @@ int main()
       {
          if(q.first!=p.first && q.second->line_number==p.second->line_number)
          {
-            temp.insert(p.first);
-            temp.insert(q.first);
+            if(q.second->pointers == p.second->pointers
+               && p.second->dimension == q.second->dimension)
+            {
+               temp.insert(p.first);
+               temp.insert(q.first);
+            }
          }
       }
       if(!temp.empty()) in_name_eq.insert(temp);
+   }
+
+   set<set<string>> struct_eq;
+
+   int size = def.size();
+
+   vector<string> cur_matrix[size],new_matrix[size];
+   for(int i=0;i<size;i++)
+   {
+      for(int j=0; j<size; j++)
+      {
+         cur_matrix[i].push_back("T");
+         new_matrix[i].push_back("T");
+      }
+   }
+
+   map<string,Datatype*> all_types;
+   set<string> type_names;
+   for(auto p:def)
+   {
+      all_types[p.first] = p.second;
+      type_names.insert(p.first);
+   }
+
+   vector<string> temp;
+   for(auto p: type_names)
+      temp.push_back(p);
+
+   while(true)
+   {
+      int i=0;
+      for(auto p:all_types)
+      {
+         int j=0;
+         for(auto q:all_types)
+         {
+            if(p.first!=q.first)
+            {
+               auto x = p.second,y = q.second;
+               string type_x = x->type,type_y = y->type;
+               while(x!=NULL)
+               {
+                  type_x = x->type;
+                  x = x->link;
+               }
+               while(y!=NULL)
+               {
+                  type_y = y->type;
+                  y = y->link;
+               }
+               if(type_x != type_y)
+                  cur_matrix[i][j]="N";
+               else
+               {
+                  x = p.second, y = q.second;
+                  if(x->pointers != y->pointers)
+                     cur_matrix[i][j]="N";
+
+                  else if(x->dimension!=y->dimension)
+                     cur_matrix[i][j]="N";
+                  else
+                  {
+                     if(x->members.size()!=y->members.size())
+                        cur_matrix[i][j]="N";
+
+                     else
+                     {
+                        int mem_size = x->members.size();
+                        for(int k=0;k < mem_size; k++)
+                        {
+                           Datatype* e = x->members[k];
+                           Datatype* f = y->members[k];
+                           string type_e = e->type;
+                           string type_f = f->type;
+                           int idx_e = 0, idx_f =0;
+
+                           for(auto iter:type_names)
+                              if(iter==type_e) break;
+                              else idx_e++;
+
+                           for(auto iter:type_names)
+                              if(iter==type_f) break;
+                              else idx_f++;
+
+                           if(cur_matrix[idx_e][idx_f]=="N")
+                              cur_matrix[i][j]="N";
+
+                           if(e->pointers != f->pointers)
+                              cur_matrix[i][j]="N";
+
+                           if(e->dimension!=f->dimension)
+                              cur_matrix[i][j]="N";
+                        }
+                     }
+                  }
+               }
+            }
+            j++;
+         }
+         i++;
+      }
+      int flag = 0;
+      for(int i=0; i<size;i++)
+         if(cur_matrix[i]!=new_matrix[i])
+         {
+            flag=1;
+            break;
+         }
+      if(flag==0) break;
+      for(int i=0; i<size;i++)
+         new_matrix[i] = cur_matrix[i];
    }
 
    

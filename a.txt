@@ -2,8 +2,15 @@ struct box
 {
 	int a;
 	float b;
+	box *p;
 };
 
+struct box2
+{
+	int a;
+	float *b;
+	box *p;
+};
 struct box B,C;
 
 int a,b;
@@ -11,7 +18,10 @@ int a,b;
 int *c,*d;
 
 int e[10][10],f[10][10];
+int g[10][10];
 
 typedef int cm,inch;
 
-cm X,Y;
+typedef float km;
+
+cm X,Y,Z;
