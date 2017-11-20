@@ -343,10 +343,6 @@ int main()
       type_names.insert(p.first);
    }
 
-   vector<string> temp;
-   for(auto p: type_names)
-      temp.push_back(p);
-
    while(true)
    {
       int i=0;
@@ -432,7 +428,100 @@ int main()
          new_matrix[i] = cur_matrix[i];
    }
 
-   
+   for(auto p:var_to_type)
+   {
+      set<string> temp;
+      for(auto q: var_to_type)
+      {
+         if(p.first!=q.first)
+         {
+            string type1 = p.second->type;
+            string type2 = q.second->type;
+            int idx_e = 0, idx_f =0;
+
+            for(auto iter:type_names)
+               if(iter==type1) break;
+               else idx_e++;
+
+            for(auto iter:type_names)
+               if(iter==type2) break;
+               else idx_f++;
+
+            if(cur_matrix[idx_e][idx_f]=="T")
+            {
+               if(p.second->pointers==q.second->pointers
+                  && p.second->dimension==q.second->dimension)
+               {
+                  temp.insert(p.first);
+                  temp.insert(q.first);
+               }
+            }
+         }
+      }
+      if(!temp.empty())
+         struct_eq.insert(temp);
+   }
+
+   for(auto p:name_eq)
+   {
+      cout<<"Variables ";
+      for(auto q:p)
+         cout<<q<<" ";
+      cout<<"are name equivalent"<<endl;
+   }
+
+   cout<<"\n//////////////////////////////////////////////////////////////////\n\n";
+
+   for(auto p:in_name_eq)
+   {
+      cout<<"Variables ";
+      for(auto q:p)
+         cout<<q<<" ";
+      cout<<"are internal name equivalent"<<endl;
+   }
+
+   cout<<"\n//////////////////////////////////////////////////////////////////\n\n";
+
+   for(auto p:struct_eq)
+   {
+      cout<<"Variables ";
+      for(auto q:p)
+         cout<<q<<" ";
+      cout<<"are structurally equivalent"<<endl;
+   }
+
+   cout<<"\n//////////////////////////////////////////////////////////////////\n\n";
+
+   map<string,Datatype*> all_vars;
+   for(auto p:var_to_type) all_vars[p.first]=p.second;
+   for(auto p:struct_var_to_type)  all_vars[p.first]=p.second;
+
+   cout<<" ";
+   for(auto p:all_vars)
+      cout<<"  "<<p.first;
+   cout<<endl<<endl;
+
+   for(auto p:all_vars)
+   {
+      cout<<p.first<<"  ";
+      for(auto q:all_vars)
+      {
+            string type1 = p.second->type;
+            string type2 = q.second->type;
+            int idx_e = 0, idx_f =0;
+
+            for(auto iter:type_names)
+               if(iter==type1) break;
+               else idx_e++;
+
+            for(auto iter:type_names)
+               if(iter==type2) break;
+               else idx_f++;
+
+            cout<<cur_matrix[idx_e][idx_f]<<"  ";
+      }
+      cout<<endl<<endl;
+   }
 
    return 0;
 }
