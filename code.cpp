@@ -14,7 +14,7 @@ struct Datatype{
 map<string,Datatype*> var_to_type;
 set<string> types = {"int","float","double","char","void"};
 map<string,Datatype*> def;
-int l_no;
+int l_no,flag;
 
 int main()
 {
@@ -30,6 +30,7 @@ int main()
    {
       string str;
       getline(fin,str);
+      string cur_line = str;
       stringstream strstream(str);
       strstream >> str;
 
@@ -37,6 +38,11 @@ int main()
       {
          l_no++;
          strstream >> str;
+         for(int i=0; i<cur_line.size();i++)
+         {
+            if(cur_line[i]==';')
+               goto var_struct_dec;
+         }
          Datatype* x = new Datatype;
          x->type = str;
          types.insert(str);
@@ -158,8 +164,10 @@ int main()
       }
       else
       {
+         var_struct_dec:flag = 1;
          string var_type = str;
          strstream >> str;
+
          int st=0 , en=0;
          for(int i=0;i<str.size();i++)
          {
@@ -223,19 +231,11 @@ int main()
                   y->name = var_name;
                }
                var_to_type[y->name] = y;
+               flag = 0;
             }
          }
       }
    }
-
-   /*for(auto q: var_to_type)
-   {
-      cout<<q.first<<endl;
-      cout<<q.second->type<<endl;
-      cout<<q.second->pointers<<endl;
-      cout<<q.second->members.size()<<endl;
-      cout<<q.second->dimension.size()<<endl;
-      cout<<"*************************************\n";
-   }*/
+   
    return 0;
 }

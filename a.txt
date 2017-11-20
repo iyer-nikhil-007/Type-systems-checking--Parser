@@ -1,3 +1,7 @@
-typedef int cm;
-typedef cm inch;
-typedef inch meter,kilometer;
+struct box
+{
+	int a;
+	float b;
+};
+
+struct box B;
