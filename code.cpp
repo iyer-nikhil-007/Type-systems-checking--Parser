@@ -35,12 +35,17 @@ int main()
       string cur_line = str;
       stringstream strstream(str);
       strstream >> str;
-      if(str.empty())   continue;
+      if(str.empty())
+      {
+         l_no++;
+         continue;
+      }
       //cout<<str<<endl;
 
       if(str == "struct")
       {
          l_no++;
+         //cout<<str<<" "<<l_no<<endl;
          strstream >> str;
          for(int i=0; i<cur_line.size();i++)
          {
@@ -60,13 +65,13 @@ int main()
          {
             getline(fin,str);
             l_no++;
+            //cout<<str<<" "<<l_no<<endl;
             stringstream strstream(str);
             strstream >> str;
-            if(str =="{")  {  l_no++;  continue;   }
-            else if(str[0]=='}') {  l_no++;  break;   }
+            if(str =="{")    continue;
+            else if(str[0]=='}')   break;
             else
             {
-               l_no++;
                string var_type = str;
                strstream >> str;
                int st=0 , en=0;
@@ -177,6 +182,7 @@ int main()
          var_struct_dec: goto_flag = 1-goto_flag;
          //cout<<3<<endl;
          //cout<<goto_flag<<endl;
+         if(goto_flag!=0)  l_no++;
          string var_type = str;
          strstream >> str;
 
@@ -194,10 +200,11 @@ int main()
                string s = str.substr(st,en-st);
 
                Datatype* y = new Datatype;
-               y->type = var_type;
                y->dimension = def[var_type]->dimension;
+               y->type = var_type;
                y->members = def[var_type]->members;
                y->pointers = def[var_type]->pointers;
+               y->line_number = l_no;
 
                en++;
                st = en;
@@ -251,10 +258,11 @@ int main()
       }
    }
 
-   set<string> name_eq,int_name_eq,struct_eq;
+   set<set<string>> name_eq;
 
    for(auto p:var_to_type)
    {
+      set<string> temp;
       for(auto q:var_to_type)
       {
          if(q.first != p.first)
@@ -264,17 +272,47 @@ int main()
                if((q.second->pointers==0 && p.second->pointers==0) &&
                   (q.second->dimension.size()==0 && p.second->dimension.size()==0))
                {
-                  cout<<q.first<<" "<<p.first<<endl;
-                  cout<<q.second->type<<" "<<p.second->type<<endl;
-                  name_eq.insert(p.first);
-                  name_eq.insert(q.first);
+                  temp.insert(p.first);
+                  temp.insert(q.first);
                }
             }
          }
       }
+      if(!temp.empty())
+         name_eq.insert(temp);
    }
-   /*for(auto p:name_eq)
-      cout<<p<<" ";
-   cout<<endl;*/
+
+   set<set<string>> in_name_eq = name_eq;
+
+   for(auto p:var_to_type)
+   {
+      set<string> temp;
+      for(auto q:var_to_type)
+      {
+         if(q.first!=p.first && q.second->line_number==p.second->line_number)
+         {
+            temp.insert(p.first);
+            temp.insert(q.first);
+         }
+      }
+      if(!temp.empty()) in_name_eq.insert(temp);
+   }
+
+   for(auto p:struct_var_to_type)
+   {
+      set<string> temp;
+      for(auto q:struct_var_to_type)
+      {
+         if(q.first!=p.first && q.second->line_number==p.second->line_number)
+         {
+            temp.insert(p.first);
+            temp.insert(q.first);
+         }
+      }
+      if(!temp.empty()) in_name_eq.insert(temp);
+   }
+
+   
+
    return 0;
 }
