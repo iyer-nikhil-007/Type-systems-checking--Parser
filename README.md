@@ -1,6 +1,6 @@
 # parser
 
-This parser is generated to read a C code and break it down into various elemnts and check for type equivalences between different variables based on their datatypes.
+This parser is generated to read a C code and break it down into various elements and check for type equivalences between different variables based on their datatypes.
 
 a.txt: input file. Can be modified
 
