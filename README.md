@@ -1,8 +1,12 @@
-# parser
+# Parser
 
 This parser is generated to read a C code and break it down into various elements and check for type equivalences between different variables based on their datatypes.
 
-a.txt: input file. Can be modified
+Input file:
+----------
+a.txt. Can be modified
 
-code.cpp: contains the code for the parser. Currently takes care of primitive datatypes, struct declarations and typedefs.
+Code:
+-----
+code.cpp contains the code for the parser. Currently takes care of primitive datatypes, struct declarations and typedefs.
 
